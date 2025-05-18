@@ -19,10 +19,14 @@ CREATE TABLE IF NOT EXISTS rental_data(
 );
 --2\DML Queries.
 --2.1\ Add some constraints to the table..
+--Add a hidden table to check the rent date use (INVISIBLE) keyword.
 USE rental_tracking;
 ALTER TABLE rental_data CHANGE insertion_date insertion_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE rental_data CHANGE 	updating_date updating_date DATETIME  ON UPDATE CURRENT_TIMESTAMP;
 ALTER TABLE rental_data CHANGE 	return_date return_date DATETIME   CHECK(return_date>=rent_date) ;
+ALTER TABLE rental_data ADD COLUMN c_time  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP INVISIBLE;
+ALTER TABLE rental_data CHANGE rent_date rent_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP CHECK(rent_date<=c_time);
+
 --2.2\ Insert the data into table(csv)
 USE rental_tracking;
 INSERT INTO rental_data (
@@ -153,3 +157,23 @@ INSERT INTO rental_data (
     "2025-04-22 14:00:00",
     22
     );
+--2.3\ using SELECT Query to check the data..
+-- a Query to selecting all records
+USE rental_tracking;
+SELECT *
+FROM rental_data;
+--a Query to selecting with condition (daily_rent>25).
+USE rental_tracking;
+SELECT customer_name ,costume,rent_date,daily_rent
+FROM rental_data
+WHERE daily_rent>25;
+--a Query to selecting with condition (customer_name="Alice Johnson").
+USE rental_tracking;
+SELECT *
+FROM rental_data
+WHERE customer_name="Alice Johnson";
+--a Query to Update with condition (rental_id IN(1,3)).
+USE rental_tracking;
+UPDATE rental_data
+SET daily_rent=28
+WHERE rental_id IN(1,3);
